@@ -28,59 +28,68 @@ var MAX_MODULES = 57;
 var INTEGER_MATH_SHIFT = 8;
 var CENTER_QUORUM = 2;
 
-qrcode.orderBestPatterns=function(patterns) {
-            
-            function distance( pattern1,  pattern2) {
-                xDiff = pattern1.X - pattern2.X;
-                yDiff = pattern1.Y - pattern2.Y;
-                return  Math.sqrt( (xDiff * xDiff + yDiff * yDiff));
-            }
-            
-            /// <summary> Returns the z component of the cross product between vectors BC and BA.</summary>
-            function crossProductZ( pointA,  pointB,  pointC) {
-                var bX = pointB.x;
-                var bY = pointB.y;
-                return ((pointC.x - bX) * (pointA.y - bY)) - ((pointC.y - bY) * (pointA.x - bX));
-            }
+qrcode.orderBestPatterns = function(patterns) {
+    if(!patterns.length === 3) { return; }
 
-            
-            // Find distances between pattern centers
-            var zeroOneDistance = distance(patterns[0], patterns[1]);
-            var oneTwoDistance = distance(patterns[1], patterns[2]);
-            var zeroTwoDistance = distance(patterns[0], patterns[2]);
-            
-            var pointA, pointB, pointC;
-            // Assume one closest to other two is B; A and C will just be guesses at first
-            if (oneTwoDistance >= zeroOneDistance && oneTwoDistance >= zeroTwoDistance) {
-                pointB = patterns[0];
-                pointA = patterns[1];
-                pointC = patterns[2];
-            }
-            else if (zeroTwoDistance >= oneTwoDistance && zeroTwoDistance >= zeroOneDistance) {
-                pointB = patterns[1];
-                pointA = patterns[0];
-                pointC = patterns[2];
-            }
-            else {
-                pointB = patterns[2];
-                pointA = patterns[0];
-                pointC = patterns[1];
-            }
-            
-            // Use cross product to figure out whether A and C are correct or flipped.
-            // This asks whether BC x BA has a positive z component, which is the arrangement
-            // we want for A, B, C. If it's negative, then we've got it flipped around and
-            // should swap A and C.
-            if (crossProductZ(pointA, pointB, pointC) < 0.0) {
-                var temp = pointA;
-                pointA = pointC;
-                pointC = temp;
-            }
-            
-            patterns[0] = pointA;
-            patterns[1] = pointB;
-            patterns[2] = pointC;
+    function distance(pattern1,  pattern2) {
+        if(!!pattern1 && !!pattern2) {
+            xDiff = pattern1.X - pattern2.X;
+            yDiff = pattern1.Y - pattern2.Y;
+            return(Math.sqrt(xDiff * xDiff + yDiff * yDiff));
+        }else {
+            return;
         }
+    }
+    
+    /// <summary> Returns the z component of the cross product between vectors BC and BA.</summary>
+    function crossProductZ(pointA, pointB, pointC) {
+        if(!!pointA && !!pointB && !!pointC) {
+            var bX = pointB.x;
+            var bY = pointB.y;
+            return ((pointC.x - bX) * (pointA.y - bY)) - ((pointC.y - bY) * (pointA.x - bX));
+        } else {
+            return;
+        }
+    }
+
+    
+    // Find distances between pattern centers
+    var zeroOneDistance = distance(patterns[0], patterns[1]);
+    var oneTwoDistance = distance(patterns[1], patterns[2]);
+    var zeroTwoDistance = distance(patterns[0], patterns[2]);
+    
+    var pointA, pointB, pointC;
+    // Assume one closest to other two is B; A and C will just be guesses at first
+    if (oneTwoDistance >= zeroOneDistance && oneTwoDistance >= zeroTwoDistance) {
+        pointB = patterns[0];
+        pointA = patterns[1];
+        pointC = patterns[2];
+    }
+    else if (zeroTwoDistance >= oneTwoDistance && zeroTwoDistance >= zeroOneDistance) {
+        pointB = patterns[1];
+        pointA = patterns[0];
+        pointC = patterns[2];
+    }
+    else {
+        pointB = patterns[2];
+        pointA = patterns[0];
+        pointC = patterns[1];
+    }
+    
+    // Use cross product to figure out whether A and C are correct or flipped.
+    // This asks whether BC x BA has a positive z component, which is the arrangement
+    // we want for A, B, C. If it's negative, then we've got it flipped around and
+    // should swap A and C.
+    if (crossProductZ(pointA, pointB, pointC) < 0.0) {
+        var temp = pointA;
+        pointA = pointC;
+        pointC = temp;
+    }
+    
+    patterns[0] = pointA;
+    patterns[1] = pointB;
+    patterns[2] = pointC;
+}
 
 
 function FinderPattern(posX, posY,  estimatedModuleSize) {

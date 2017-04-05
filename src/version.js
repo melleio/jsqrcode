@@ -169,11 +169,9 @@ Version.getVersionForNumber=function( versionNumber)
 	return Version.VERSIONS[versionNumber - 1];
 }
 
-Version.getProvisionalVersionForDimension=function(dimension)
-{
-	if (dimension % 4 != 1)
-	{
-		throw "Error getProvisionalVersionForDimension";
+Version.getProvisionalVersionForDimension=function(dimension) {
+	if(dimension % 4 != 1) {
+		return false;
 	}
 	try
 	{

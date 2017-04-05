@@ -232,22 +232,21 @@ function Detector(image)
 		
 
 	
-	this.calculateModuleSizeOneWay=function( pattern,  otherPattern)
-		{
-			var moduleSizeEst1 = this.sizeOfBlackWhiteBlackRunBothWays(Math.floor( pattern.X), Math.floor( pattern.Y), Math.floor( otherPattern.X), Math.floor(otherPattern.Y));
+	this.calculateModuleSizeOneWay = function(pattern, otherPattern) {
+		if(!!pattern) {
+			var moduleSizeEst1 = this.sizeOfBlackWhiteBlackRunBothWays(Math.floor(pattern.X), Math.floor( pattern.Y), Math.floor( otherPattern.X), Math.floor(otherPattern.Y));
 			var moduleSizeEst2 = this.sizeOfBlackWhiteBlackRunBothWays(Math.floor(otherPattern.X), Math.floor(otherPattern.Y), Math.floor( pattern.X), Math.floor(pattern.Y));
-			if (isNaN(moduleSizeEst1))
-			{
+			if (isNaN(moduleSizeEst1)) {
 				return moduleSizeEst2 / 7.0;
 			}
-			if (isNaN(moduleSizeEst2))
-			{
+			if (isNaN(moduleSizeEst2)) {
 				return moduleSizeEst1 / 7.0;
 			}
 			// Average them, and divide by 7 since we've counted the width of 3 black modules,
 			// and 1 white and 1 black module on either side. Ergo, divide sum by 14.
-			return (moduleSizeEst1 + moduleSizeEst2) / 14.0;
+			return((moduleSizeEst1 + moduleSizeEst2) / 14.0);
 		}
+	}
 
 	
 	this.calculateModuleSize=function( topLeft,  topRight,  bottomLeft)
@@ -256,36 +255,29 @@ function Detector(image)
 			return (this.calculateModuleSizeOneWay(topLeft, topRight) + this.calculateModuleSizeOneWay(topLeft, bottomLeft)) / 2.0;
 		}
 
-	this.distance=function( pattern1,  pattern2)
-	{
-		xDiff = pattern1.X - pattern2.X;
-		yDiff = pattern1.Y - pattern2.Y;
-		return  Math.sqrt( (xDiff * xDiff + yDiff * yDiff));
-	}
-	this.computeDimension=function( topLeft,  topRight,  bottomLeft,  moduleSize)
-		{
-			
-			var tltrCentersDimension = Math.round(this.distance(topLeft, topRight) / moduleSize);
-			var tlblCentersDimension = Math.round(this.distance(topLeft, bottomLeft) / moduleSize);
-			var dimension = ((tltrCentersDimension + tlblCentersDimension) >> 1) + 7;
-			switch (dimension & 0x03)
-			{
-				
-				// mod 4
-				case 0: 
-					dimension++;
-					break;
-					// 1? do nothing
-				
-				case 2: 
-					dimension--;
-					break;
-				
-				case 3: 
-					throw "Error";
-				}
-			return dimension;
+	this.distance = function(pattern1, pattern2) {
+		if(!!pattern1 && !! pattern2) {
+			xDiff = pattern1.X - pattern2.X;
+			yDiff = pattern1.Y - pattern2.Y;
+			return  Math.sqrt( (xDiff * xDiff + yDiff * yDiff));
 		}
+	}
+	this.computeDimension = function(topLeft, topRight, bottomLeft, moduleSize) {
+		var tltrCentersDimension = Math.round(this.distance(topLeft, topRight) / moduleSize);
+		var tlblCentersDimension = Math.round(this.distance(topLeft, bottomLeft) / moduleSize);
+		var dimension = ((tltrCentersDimension + tlblCentersDimension) >> 1) + 7;
+		switch(dimension & 0x03) {
+			// mod 4
+			case 0: 
+				dimension++;
+				break;
+				// 1? do nothing
+			case 2: 
+				dimension--;
+				break;
+		}
+		return dimension;
+	}
 
 	this.findAlignmentInRegion=function( overallEstModuleSize,  estAlignmentX,  estAlignmentY,  allowanceFactor)
 		{
@@ -306,30 +298,21 @@ function Detector(image)
 			return alignmentFinder.find();
 		}
 		
-	this.createTransform=function( topLeft,  topRight,  bottomLeft, alignmentPattern, dimension)
-		{
-			var dimMinusThree =  dimension - 3.5;
+	this.createTransform = function(topLeft, topRight, bottomLeft, alignmentPattern, dimension) {
+			var dimMinusThree = dimension - 3.5;
 			var bottomRightX;
 			var bottomRightY;
 			var sourceBottomRightX;
 			var sourceBottomRightY;
-			if (alignmentPattern != null)
-			{
+			if (alignmentPattern != null) {
 				bottomRightX = alignmentPattern.X;
 				bottomRightY = alignmentPattern.Y;
 				sourceBottomRightX = sourceBottomRightY = dimMinusThree - 3.0;
-			}
-			else
-			{
-				// Don't have an alignment pattern, just make up the bottom-right point
-				bottomRightX = (topRight.X - topLeft.X) + bottomLeft.X;
-				bottomRightY = (topRight.Y - topLeft.Y) + bottomLeft.Y;
-				sourceBottomRightX = sourceBottomRightY = dimMinusThree;
-			}
 			
-			var transform = PerspectiveTransform.quadrilateralToQuadrilateral(3.5, 3.5, dimMinusThree, 3.5, sourceBottomRightX, sourceBottomRightY, 3.5, dimMinusThree, topLeft.X, topLeft.Y, topRight.X, topRight.Y, bottomRightX, bottomRightY, bottomLeft.X, bottomLeft.Y);
-			
-			return transform;
+				var transform = PerspectiveTransform.quadrilateralToQuadrilateral(3.5, 3.5, dimMinusThree, 3.5, sourceBottomRightX, sourceBottomRightY, 3.5, dimMinusThree, topLeft.X, topLeft.Y, topRight.X, topRight.Y, bottomRightX, bottomRightY, bottomLeft.X, bottomLeft.Y);
+				
+				return transform;
+			}
 		}		
 	
 	this.sampleGrid=function( image,  transform,  dimension)
@@ -357,8 +340,7 @@ function Detector(image)
 			
 			var alignmentPattern = null;
 			// Anything above version 1 has an alignment pattern
-			if (provisionalVersion.AlignmentPatternCenters.length > 0)
-			{
+			if(!!provisionalVersion.AlignmentPatternCenters) {
 				
 				// Guess where a "bottom right" finder pattern would have been
 				var bottomRightX = topRight.X - topLeft.X + bottomLeft.X;
