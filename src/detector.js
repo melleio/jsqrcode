@@ -390,6 +390,8 @@ function Detector(image)
 	{
 		var info =  new FinderPatternFinder().findFinderPattern(this.image);
 			
+		console.log(this.processFinderPatternInfo(info)); 
+			
 		return this.processFinderPatternInfo(info); 
 	}
 }

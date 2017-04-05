@@ -23,8 +23,8 @@
 */
 
 
-function BitMatrixParser(bitMatrix)
-{
+function BitMatrixParser(bitMatrix) {
+	if(!bitMatrix) { return; }
 	var dimension = bitMatrix.Dimension;
 	if (dimension < 21 || (dimension & 0x03) != 1)
 	{

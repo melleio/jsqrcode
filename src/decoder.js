@@ -54,8 +54,8 @@ Decoder.correctErrors=function( codewordBytes,  numDataCodewords)
 	}
 }
 
-Decoder.decode=function(bits)
-{
+Decoder.decode = function(bits) {
+	if(!bits) { return; }
 	var parser = new BitMatrixParser(bits);
 	var version = parser.readVersion();
 	var ecLevel = parser.readFormatInformation().ErrorCorrectionLevel;
